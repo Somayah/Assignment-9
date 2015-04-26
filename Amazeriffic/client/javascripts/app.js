@@ -1,6 +1,7 @@
 var main = function (toDoObjects) {
     "use strict";
     console.log("SANITY CHECK");
+    //Adding Socket.IO to the client 
     var socket = io();
 
     var toDos = toDoObjects.map(function (toDo) {
@@ -9,20 +10,34 @@ var main = function (toDoObjects) {
           return toDo.description;
     });
 
-    // reciving a respones from the server to show the discription 
+    /*reciving a respones from the server to
+     update clinets' tabs (Newest,oldest,Tag)*/
+    //-----------------------------------------
         socket.on('broadcast add', function(data){
-        toDoObjects.push(data);
-        toDos.push(data.description);
-        console.log("in socket event broadcast add - data:"+data);
-        $('#client').append($('<p>').text(data.description));
-        // Alerting clients when a ToDo item is added with slideDown function 
-        $("#client").slideDown(1000, function() {
-             $("#client").delay(1000).slideUp(1000);
-          });
-        $( ".active" ).trigger( "click" );
-
-        console.log("toDoObjects after append new broadcast");
-        console.log(JSON.stringify(toDoObjects));
+            var $newest= $('#newestList'),
+                $oldest= $('#oldestList'),
+                $tagTab= $('#tagList'),
+                $myData= data.description,
+                $myTag= data.tags,
+                $newItem= $("<li>").text($myData).hide();
+        // Alerting clients when a ToDo item is added by Sliding down new ToDo
+        if (($newest.length)>0) {
+            $newest.prepend($newItem);
+            $newItem.slideDown(1000);    // 1000 seconds 
+        } else if (($oldest.length)>0) {
+            $oldest.append($newItem);
+            $newItem.slideDown(1000);
+        } else if (($tagTab.length)>0) {
+            $tagTab.append($("<h3>").text($myTag));
+            $tagTab.append($newItem);
+            $newItem.slideDown(1000);
+        }
+        
+        $.getJSON("todos.json", function(newToDoObjects) {
+            toDos = newToDoObjects.map(function(toDo) {
+                return toDo.description;
+            });
+        });
     });
     // end Socket.io script
 
@@ -41,12 +56,12 @@ var main = function (toDoObjects) {
             $("main .content").empty();
 
             if ($element.parent().is(":nth-child(1)")) {
-                $content = $("<ul>");
+                $content = $("<ul  id='newestList'>");
                 for (i = toDos.length-1; i >= 0; i--) {
                     $content.append($("<li>").text(toDos[i]));
                 }
             } else if ($element.parent().is(":nth-child(2)")) {
-                $content = $("<ul>");
+                $content = $("<ul id='oldestList'>");
                 toDos.forEach(function (todo) {
                     $content.append($("<li>").text(todo));
                 });
@@ -79,7 +94,7 @@ var main = function (toDoObjects) {
 
                 tagObjects.forEach(function (tag) {
                     var $tagName = $("<h3>").text(tag.name),
-                        $content = $("<ul>");
+                        $content = $("<ul id='tagList'>");
 
 
                     tag.toDos.forEach(function (description) {

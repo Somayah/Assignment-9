@@ -1,6 +1,7 @@
 var express = require("express"),
       app = express(),
     http = require('http').Server(app),
+    //Adding Socket.IO to the server 
     io = require('socket.io')(http),
     // import the mongoose library
     mongoose = require("mongoose");
@@ -9,13 +10,14 @@ var express = require("express"),
     app.use(express.bodyParser());
 
     // connect to the amazeriffic data store in mongo
-    mongoose.connect('mongodb://localhost/amazerciffi');
+    mongoose.connect('mongodb://localhost/amazeriffic');
 
-    // listen to port 3000
+    // listen to port 3333
     http.listen(3333, function(){
       console.log('listening on *:3333');
     });
-
+    // Socket.IO connection
+    //---------------------
     io.on('connection', function (socket) {
        // every opening browesr will have a new connection
        console.log("a user connected");
