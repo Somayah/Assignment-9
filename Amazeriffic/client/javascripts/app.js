@@ -28,13 +28,14 @@ var main = function (toDoObjects) {
             $oldest.append($newItem);
             $newItem.slideDown(1000);
         } else if (($tagTab.length)>0) {
-            $tagTab.append($("<h3>").text($myTag));
-            $tagTab.append($newItem);
+            $("main .content").append($("<h3>").text($myTag));
+            $("main .content").append($newItem);
             $newItem.slideDown(1000);
         }
         
-        $.getJSON("todos.json", function(newToDoObjects) {
-            toDos = newToDoObjects.map(function(toDo) {
+     $.getJSON("todos.json", function (newToDoObjects) {
+            toDoObjects = newToDoObjects;
+            toDos = newToDoObjects.map(function (toDo) {
                 return toDo.description;
             });
         });
@@ -91,7 +92,6 @@ var main = function (toDoObjects) {
                 });
 
                 console.log(tagObjects);
-
                 tagObjects.forEach(function (tag) {
                     var $tagName = $("<h3>").text(tag.name),
                         $content = $("<ul id='tagList'>");
